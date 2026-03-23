@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memento Mori, A Matemática da Vida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f9fafb;
+            color: #111827;
+            font-family: 'Georgia', serif;
+            scroll-behavior: smooth;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(52, minmax(4px, 12px));
+            gap: 3px;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding-bottom: 2rem;
+        }
+
+        .week-box {
+            aspect-ratio: 1 / 1;
+            border: 1px solid #d1d5db;
+            border-radius: 1px;
+            transition: transform 0.15s ease, background-color 0.3s ease;
+            will-change: transform;
+        }
+
+        .week-box:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .lived {
+            background-color: #111827;
+            border-color: #111827;
+        }
+
+        .remaining {
+            background-color: transparent;
+        }
+
+        .lost {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 640px) {
+            .grid-container {
+                grid-template-columns: repeat(26, minmax(6px, 10px));
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animação do Botão Toggle (Switch) */
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ef4444; /* red-500 */
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot {
+            transform: translateX(100%);
+        }
+        
+        /* Efeito no cartão inteiro quando selecionado */
+        .risk-card:has(input:checked) {
+            border-color: #fca5a5; /* red-300 */
+            background-color: #fef2f2; /* red-50 */
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-5xl w-full">
+        <header class="text-center mb-8 mt-2">
+            <h1 class="text-4xl md:text-5xl font-bold uppercase tracking-widest mb-3 text-gray-900">Memento Mori</h1>
+            <p class="text-gray-600 italic text-lg">A finitude biológica em 4120 semanas</p>
+        </header>
+
+        <main class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 mb-8 font-sans">
+            
+            <!-- PASSO 1: Data de Nascimento -->
+            <div id="step-1" class="relative max-w-md mx-auto text-center">
+                <label for="birthdate" class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Sua Data de Nascimento</label>
+                <input type="text" id="birthdate" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric"
+                    class="w-full p-4 text-center text-xl tracking-widest font-bold border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-gray-900 outline-none transition-colors shadow-sm bg-gray-50 focus:bg-white text-gray-800">
+                <p class="text-xs text-gray-400 mt-2 font-medium">Digite sua data para prosseguir.</p>
+                
+                <button id="btn-next" onclick="showStep2()" disabled
+                    class="w-full mt-6 bg-gray-900 text-white font-bold py-4 rounded-2xl uppercase tracking-widest transition duration-300 shadow-md opacity-50 cursor-not-allowed hover:bg-gray-800">
+                    Continuar
+                </button>
+            </div>
+
+            <!-- PASSO 2: Fatores de Risco (Inicialmente Oculto) -->
+            <div id="step-2" class="hidden fade-in border-t border-gray-100 pt-8 mt-8">
+                <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide text-center">Fatores de Risco, Ladrões do Tempo</label>
+                <p class="text-sm text-gray-500 mb-6 text-center max-w-2xl mx-auto">Ative as condições presentes na sua rotina atual. Se você não possuir nenhuma, basta avançar e gerar o seu calendário.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Tabagismo Ativo</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -10 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="520">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Obesidade</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -6 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="312">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Sedentarismo Clínico</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -4 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="208">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Sem Checkup Regular</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -3 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="156">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Doenças Crônicas Não Estabilizadas</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -8 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="416">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="risk-card relative cursor-pointer flex items-center justify-between p-4 border-2 border-gray-100 rounded-2xl transition-all duration-300 bg-white group select-none hover:shadow-md">
+                        <div class="flex flex-col pr-2">
+                            <span class="font-bold text-gray-800 text-base md:text-sm lg:text-base leading-tight transition-colors">Privação de Sono</span>
+                            <span class="text-xs font-bold text-red-500 mt-1">Penalidade: -3 anos</span>
+                        </div>
+                        <div class="relative shrink-0">
+                            <input type="checkbox" class="sr-only risk-factor toggle-checkbox" value="156">
+                            <div class="toggle-label block bg-gray-200 w-12 h-7 rounded-full transition-colors duration-300 ease-in-out">
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                </div>
+
+                <button id="btn-calculate" onclick="generateCalendar()" 
+                    class="w-full max-w-md mx-auto block mt-8 bg-gray-900 text-white font-bold py-4 rounded-2xl uppercase tracking-widest hover:bg-gray-800 transition duration-300 shadow-md">
+                    Nenhum fator, gerar calendário
+                </button>
+            </div>
+        </main>
+
+        <!-- Seção de Resultados (PASSO 3) -->
+        <div id="results-section" class="hidden">
+            
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 mb-8 font-sans fade-in">
+                <h3 class="text-xl font-bold text-gray-800 uppercase tracking-wide mb-6 text-center border-b border-gray-100 pb-4">Proporção da Finitude</h3>
+                
+                <div class="w-full h-8 rounded-full flex overflow-hidden shadow-inner mb-2 bg-gray-100">
+                    <div id="bar-lived" class="bg-gray-900 h-full transition-all duration-700 ease-out" style="width: 0%" title="Tempo Vivido"></div>
+                    <div id="bar-remaining" class="bg-gray-200 h-full transition-all duration-700 ease-out border-x border-white" style="width: 0%" title="Tempo Restante"></div>
+                    <div id="bar-lost" class="bg-red-500 h-full transition-all duration-700 ease-out" style="width: 0%" title="Tempo Perdido"></div>
+                </div>
+
+                <div class="text-center text-sm font-bold tracking-[0.3em] text-gray-400 uppercase mb-6">
+                    Semanas
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                        <span class="block text-xs uppercase tracking-wide text-gray-500 font-bold mb-1">Vividas</span>
+                        <span id="metric-lived-abs" class="block text-2xl md:text-3xl font-bold text-gray-900">0</span>
+                        <span id="metric-lived-pct" class="text-sm font-semibold text-gray-500">0%</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-green-50 border border-green-100">
+                        <span class="block text-xs uppercase tracking-wide text-green-700 font-bold mb-1">Restantes</span>
+                        <span id="metric-remaining-abs" class="block text-2xl md:text-3xl font-bold text-green-600">0</span>
+                        <span id="metric-remaining-pct" class="text-sm font-semibold text-green-600">0%</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-red-50 border border-red-100">
+                        <span class="block text-xs uppercase tracking-wide text-red-600 font-bold mb-1">Perdidas</span>
+                        <span id="metric-lost-abs" class="block text-2xl md:text-3xl font-bold text-red-600">0</span>
+                        <span id="metric-lost-pct" class="text-sm font-semibold text-red-600">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 overflow-hidden mb-8 fade-in" style="animation-delay: 0.1s;">
+                <h2 class="text-center font-serif text-2xl mb-2 tracking-wide text-gray-900">O Calendário da Vida</h2>
+                <p class="text-center text-sm text-gray-500 font-sans mb-8">Cada quadrado representa uma semana. <span class="font-bold text-gray-900">Preto</span>, o que já se foi. <span class="font-bold text-gray-500 border border-gray-300 px-1 rounded">Vazado</span>, o que resta. <span class="font-bold text-red-600">Vermelho</span>, o que se perdeu.</p>
+                
+                <div id="grid-canvas" class="grid-container">
+                </div>
+            </div>
+            
+            <div class="text-center mb-10 fade-in" style="animation-delay: 0.2s;">
+                <p class="font-serif italic text-xl text-gray-600">"Não é a morte que um homem deve temer, mas nunca ter começado a viver."</p>
+                <p class="font-sans text-sm font-bold tracking-widest text-gray-400 mt-3">MARCO AURÉLIO</p>
+            </div>
+        </div>
+
+        <footer class="mt-4 text-center text-xs text-gray-400 font-sans px-4 pb-4 border-t border-gray-200 pt-6">
+            <p><strong class="text-gray-500">Aviso Legal e Isenção de Responsabilidade Médica,</strong> Esta aplicação foi criada exclusivamente para fins ilustrativos e de reflexão. Os cálculos e reduções de tempo são estimativas baseadas em médias globais, não são precisos para o indivíduo e não substituem, de forma alguma, o aconselhamento profissional. Para uma avaliação clínica adequada da sua saúde e dos seus fatores de risco, uma consulta deve ser realizada por um médico especializado.</p>
+        </footer>
+
+    </div>
+
+    <div id="alert-container" class="fixed top-6 right-6 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        const dateInput = document.getElementById('birthdate');
+        const btnNext = document.getElementById('btn-next');
+        const checkboxes = document.querySelectorAll('.risk-factor');
+        let hasScrolled = false;
+        let isCalendarGenerated = false;
+
+        // Controle da Data
+        dateInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); 
+            
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            }
+            
+            e.target.value = value;
+
+            if (value.length === 10) {
+                if (isCalendarGenerated) {
+                    attemptCalculation(false);
+                } else {
+                    btnNext.disabled = false;
+                    btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                if (!isCalendarGenerated) {
+                    btnNext.disabled = true;
+                    btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        });
+
+        // Revelar Passo 2
+        function showStep2() {
+            const birthdateRaw = dateInput.value;
+            const birthDate = parseDate(birthdateRaw);
+            
+            if (!birthDate) {
+                showMessage("Data de nascimento inválida. Verifique o calendário.");
+                return;
+            }
+
+            const today = new Date();
+            if (birthDate > today) {
+                showMessage("A data de nascimento não pode estar no futuro.");
+                return;
+            }
+
+            // Oculta o botão Continuar e revela a seção 2
+            btnNext.classList.add('hidden');
+            const step2 = document.getElementById('step-2');
+            step2.classList.remove('hidden');
+            
+            setTimeout(() => {
+                step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Monitorar os fatores para mudar o texto do botão ou recalcular se já gerado
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateCalculateButtonText();
+                if (isCalendarGenerated && dateInput.value.length === 10) {
+                    attemptCalculation(false);
+                }
+            });
+        });
+
+        function updateCalculateButtonText() {
+            const checkedCount = document.querySelectorAll('.risk-factor:checked').length;
+            const btn = document.getElementById('btn-calculate');
+            
+            if (checkedCount === 0) {
+                btn.innerText = "Nenhum fator, gerar calendário";
+            } else {
+                btn.innerText = "Aplicar e gerar calendário";
+            }
+        }
+
+        // Revelar Passo 3 (Resultados)
+        function generateCalendar() {
+            isCalendarGenerated = true;
+            document.getElementById('btn-calculate').classList.add('hidden'); // Oculta o botão para limpar a tela
+            attemptCalculation(true);
+        }
+
+        function parseDate(dateStr) {
+            const parts = dateStr.split('/');
+            if (parts.length !== 3 || parts[2].length !== 4) return null;
+            
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; 
+            const year = parseInt(parts[2], 10);
+            
+            const date = new Date(year, month, day);
+            if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+                return null;
+            }
+            return date;
+        }
+
+        function attemptCalculation(shouldScroll) {
+            const birthdateRaw = dateInput.value;
+            const birthDate = parseDate(birthdateRaw);
+            
+            if (!birthDate) return;
+
+            const today = new Date();
+            if (birthDate > today) return;
+
+            const baseWeeks = 4120;
+            const msPerWeek = 1000 * 60 * 60 * 24 * 7;
+            const livedWeeks = Math.floor((today - birthDate) / msPerWeek);
+            
+            let lostWeeks = 0;
+            document.querySelectorAll('.risk-factor:checked').forEach(cb => {
+                lostWeeks += parseInt(cb.value);
+            });
+
+            let displayLived = livedWeeks;
+            let displayRemaining = baseWeeks - livedWeeks - lostWeeks;
+            let displayLost = lostWeeks;
+
+            if (displayRemaining < 0) {
+                displayRemaining = 0;
+                if (displayLived + displayLost > baseWeeks) {
+                    if (displayLived >= baseWeeks) {
+                        displayLived = baseWeeks;
+                        displayLost = 0;
+                    } else {
+                        displayLost = baseWeeks - displayLived;
+                    }
+                }
+            }
+
+            updateUI(displayLived, displayRemaining, displayLost, baseWeeks, shouldScroll);
+        }
+
+        function updateUI(lived, remaining, lost, total, shouldScroll) {
+            const pctLived = ((lived / total) * 100).toFixed(1);
+            const pctRemaining = ((remaining / total) * 100).toFixed(1);
+            const pctLost = ((lost / total) * 100).toFixed(1);
+
+            document.getElementById('metric-lived-abs').innerText = lived;
+            document.getElementById('metric-lived-pct').innerText = pctLived + '%';
+            document.getElementById('metric-remaining-abs').innerText = remaining;
+            document.getElementById('metric-remaining-pct').innerText = pctRemaining + '%';
+            document.getElementById('metric-lost-abs').innerText = lost;
+            document.getElementById('metric-lost-pct').innerText = pctLost + '%';
+
+            document.getElementById('bar-lived').style.width = pctLived + '%';
+            document.getElementById('bar-remaining').style.width = pctRemaining + '%';
+            document.getElementById('bar-lost').style.width = pctLost + '%';
+
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.classList.remove('hidden');
+
+            renderGrid(lived, remaining, lost, total);
+            
+            if (shouldScroll && !hasScrolled) {
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    hasScrolled = true;
+                }, 150);
+            }
+        }
+
+        function renderGrid(lived, remaining, lost, total) {
+            const container = document.getElementById('grid-canvas');
+            container.innerHTML = ''; 
+
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < total; i++) {
+                const box = document.createElement('div');
+                box.classList.add('week-box');
+
+                if (i < lived) {
+                    box.classList.add('lived');
+                    box.title = `Semana ${i + 1}, Já vivida`;
+                } else if (i >= lived && i < lived + remaining) {
+                    box.classList.add('remaining');
+                    box.title = `Semana ${i + 1}, Restante (Viva com propósito)`;
+                } else {
+                    box.classList.add('lost');
+                    box.title = `Semana ${i + 1}, Perdida`;
+                }
+
+                fragment.appendChild(box);
+            }
+
+            container.appendChild(fragment);
+        }
+
+        function showMessage(msg) {
+            const container = document.getElementById('alert-container');
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl font-sans transform transition-all duration-300 translate-x-full opacity-0 flex items-center';
+            errorDiv.innerHTML = `<svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="font-medium tracking-wide text-sm">${msg}</span>`;
+            
+            container.appendChild(errorDiv);
+            
+            requestAnimationFrame(() => {
+                errorDiv.classList.remove('translate-x-full', 'opacity-0');
+            });
+            
+            setTimeout(() => {
+                errorDiv.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => errorDiv.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
